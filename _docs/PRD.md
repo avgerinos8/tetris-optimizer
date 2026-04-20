@@ -15,9 +15,8 @@ The program focuses on algorithmic efficiency, specifically using backtracking t
 - Shape Validation: Ensure each block consists of exactly 4 connected `#`  characters and follows a valid Tetromino shape.
 
 - Dual-Solver Architecture:
-
-+ DLX (Dancing Links): The default high-performance solver based on Knuth's Algorithm X for the Exact Cover problem.
-+ Simple Backtracker: A standard recursive backtracking implementation, accessible via a CLI flag for comparison.
+    * DLX (Dancing Links): The default high-performance solver based on Knuth's Algorithm X for the Exact Cover problem. 
+    * Simple Backtracker: A standard recursive backtracking implementation, accessible via a CLI flag for comparison.
 
 - Rotation Support: Optional ability to rotate Tetrominoes (90°, 180°, 270°) to find a solution, toggled via a flag.
 Smallest Square Optimization: Iteratively increases the board size until the first (and thus smallest) solution is found.
