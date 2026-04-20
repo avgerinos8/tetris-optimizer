@@ -14,9 +14,14 @@ The program focuses on algorithmic efficiency, specifically using backtracking t
 
 - Shape Validation: Ensure each block consists of exactly 4 connected `#`  characters and follows a valid Tetromino shape.
 
-- Optimal Square Solver: An algorithm that finds the minimum square size required to fit all provided shapes.
+- Dual-Solver Architecture:
 
-- Ordered Identification: Assign an uppercase letter (A-Z) to each Tetromino based on its appearance in the input file.
++ DLX (Dancing Links): The default high-performance solver based on Knuth's Algorithm X for the Exact Cover problem.
++ Simple Backtracker: A standard recursive backtracking implementation, accessible via a CLI flag for comparison.
+
+- Rotation Support: Optional ability to rotate Tetrominoes (90°, 180°, 270°) to find a solution, toggled via a flag.
+Smallest Square Optimization: Iteratively increases the board size until the first (and thus smallest) solution is found.
+Ordered Labeling: Identifies each shape using uppercase Latin letters (A, B, C...) based on input order.
 
 - Error Handling: Robust detection of "bad formats" (invalid characters, wrong dimensions, disconnected blocks) resulting in a single ERROR output.
 
