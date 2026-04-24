@@ -8,18 +8,25 @@ import (
 	"regexp"
 )
 
+// ── boolean ────────────────────────────────────────────────────────────────
+
 var (
 	// ModeRotation is a global variable that tells our program
 	// if it should allow rotating the pieces.
 	ModeRotation bool
 )
 
+// ── main ───────────────────────────────────────────────────────────────────
+
 func main() {
-	args()
+	filename := args()
+	openFile(filename)
 }
 
-func args() {
-	// 1. FLAG ALIASING & VARIABLE SEPARATION
+// ── read flag and arguments ────────────────────────────────────────────────
+
+func args() string {
+	// FLAG ALIASING & VARIABLE SEPARATION
 	// Why do we use two separate variables (r, rotate) instead of one?
 	// If we pointed both flags to the same variable, like this:
 	//    flag.BoolVar(&ModeRotation, "r", false, "...")
@@ -50,22 +57,30 @@ func args() {
 	*/
 	ModeRotation = r || rotate
 
-	// 2. ARGUMENT VALIDATION
+	// ARGUMENT VALIDATION
 	if len(arguments) != 1 {
+		fmt.Fprintf(os.Stderr, "Usage: %s [-r] <filename>\n", os.Args[0])
 		os.Exit(1)
 	}
-	filename := arguments[0]
+	return arguments[0]
+}
 
-	// 3. FILE HANDLING
+// ── open file ──────────────────────────────────────────────────────────────
+
+func openFile(filename string) []string {
+	// FILE HANDLING
 	file, err := os.Open(filename)
 	if err != nil {
+		// Using %q to wrap filename in quotes and printing to Stderr
+		fmt.Fprintf(os.Stderr, "Could not open filename %q: %v\n", filename, err)
 		os.Exit(1)
 	}
 	defer file.Close()
 
-	// 4. SCANNER AND REGEX
+	// SCANNER AND REGEX
+	// Added \r? to support Windows line endings (CRLF)
 	scanner := bufio.NewScanner(file)
-	re := regexp.MustCompile(`\n\s*\n`)
+	re := regexp.MustCompile(`\r?\n\s*\r?\n`)
 
 	/* WHAT IS AN ANONYMOUS FUNCTION?
 	   An anonymous function is a function defined without a name.
@@ -88,6 +103,7 @@ func args() {
 
 		// Use the "captured" Regex 're' to find the next double newline.
 		if loc := re.FindIndex(data); loc != nil {
+			// loc[0] is the start of the match, loc[1] is the end.
 			// Advance past the delimiter (loc[1])
 			// and return the text block (data[0:loc[0]])
 			return loc[1], data[0:loc[0]], nil
@@ -101,10 +117,20 @@ func args() {
 	}
 
 	scanner.Split(SplitFunction)
+	alltetrominoes := []string{}
 
 	// 5. THE EXECUTION LOOP
 	for scanner.Scan() {
 		block := scanner.Text()
 		fmt.Printf("Parsed Block:\n%s\n---\n", block)
+		alltetrominoes = append(alltetrominoes, block)
 	}
+
+	// CHECK FOR SCANNING ERRORS
+	// It's important to check if the loop terminated due to an error
+	if err := scanner.Err(); err != nil {
+		fmt.Fprintf(os.Stderr, "Error while scanning file: %v\n", err)
+	}
+
+	return alltetrominoes
 }
