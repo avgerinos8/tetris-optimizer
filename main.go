@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"regexp"
+	"strings"
 )
 
 // ── boolean ────────────────────────────────────────────────────────────────
@@ -121,9 +122,12 @@ func openFile(filename string) []string {
 
 	// 5. THE EXECUTION LOOP
 	for scanner.Scan() {
-		block := scanner.Text()
-		fmt.Printf("Parsed Block:\n%s\n---\n", block)
-		alltetrominoes = append(alltetrominoes, block)
+		block := strings.TrimSpace(scanner.Text())
+
+		if block != "" {
+			fmt.Printf("\033[38;2;051;255;119m  Parsed Block:  \033[0;00m  \n%s\n", block)
+			alltetrominoes = append(alltetrominoes, block)
+		}
 	}
 
 	// CHECK FOR SCANNING ERRORS
