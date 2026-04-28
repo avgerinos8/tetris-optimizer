@@ -1,20 +1,24 @@
 package checks
 
-import "errors"
+import (
+	"errors"
 
-func Checks(s string) Tetromino {
+	model "tetris/internal/models"
+)
+
+func Checks(s string) (model.Tetromino, error) {
 	if s != "" {
 		s, err := verifyLines(s)
 		if err != nil {
 			// ERROR INVALID TETRONOMINO
-			continue
+			return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
 		}
 		data, err := to2DSlice(s)
 		if err != nil {
 			// INTERNAL ERROR could not convert to slice
-			continue
+			return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
 		}
-		return nil
+		return model.Tetromino{}, nil
 	}
 }
 

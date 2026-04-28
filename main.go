@@ -2,22 +2,21 @@ package main
 
 import (
 	"bufio"
-	"errors"
 	"flag"
 	"fmt"
 	"os"
 	"regexp"
 	"strings"
+
 	"tetris/internal/checks"
+	model "tetris/internal/models"
 )
 
 // ── boolean ────────────────────────────────────────────────────────────────
 
-var (
-	// ModeRotation is a global variable that tells our program
-	// if it should allow rotating the pieces.
-	ModeRotation bool
-)
+// ModeRotation is a global variable that tells our program
+// if it should allow rotating the pieces.
+var ModeRotation bool
 
 // ── main ───────────────────────────────────────────────────────────────────
 
@@ -68,18 +67,9 @@ func args() string {
 	return arguments[0]
 }
 
-// ── tetromino struct ───────────────────────────────────────────────────────
-
-type Tetromino struct {
-	Letter rune
-	ID     int
-	Shape  [][]int
-	Placed bool
-}
-
 // ── open file ──────────────────────────────────────────────────────────────
 
-func openFile(filename string) []Tetromino {
+func openFile(filename string) []model.Tetromino {
 	// FILE HANDLING
 	file, err := os.Open(filename)
 	if err != nil {
@@ -130,15 +120,14 @@ func openFile(filename string) []Tetromino {
 
 	scanner.Split(SplitFunction)
 
-	alltetrominoes := []Tetromino{}
+	alltetrominoes := []model.Tetromino{}
 	shapecounter := 0
 	// 5. THE EXECUTION LOOP
 	for scanner.Scan() {
-		block := strings.TrimSpace(scanner.Text()) //remove whitespace from both ends of the string (left and right)
-			checks.Checks(block)
-			alltetrominoes = append(alltetrominoes, Tetromino{Letter: rune('A' + shapecounter), ID: -1, Shape: data, Placed: false})
-			fmt.Printf("\033[38;2;051;255;119m  Parsed Block:  \033[0;00m  \n%s\n", block)
-		}
+		block := strings.TrimSpace(scanner.Text()) // remove whitespace from both ends of the string (left and right)
+		checks.Checks(block)
+
+		fmt.Printf("\033[38;2;051;255;119m  Parsed Block:  \033[0;00m  \n%s\n", block)
 		shapecounter++
 	}
 
@@ -150,8 +139,6 @@ func openFile(filename string) []Tetromino {
 
 	return alltetrominoes
 }
-
-
 
 /*
 Το approach σου είναι πολύ σωστό και επαγγελματικό. Το να διαχωρίζεις την οπτική αναπαράσταση (Shape) από την "ταυτότητα" του σχήματος (ID) είναι η κλασική μέθοδος για τέτοια προβλήματα.
