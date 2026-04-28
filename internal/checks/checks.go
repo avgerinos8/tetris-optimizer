@@ -2,35 +2,49 @@ package checks
 
 import (
 	"errors"
+	"strings"
 
 	model "tetris/internal/models"
 )
 
-func Checks(s string) (model.Tetromino, error) {
+// Checks processes the input string and returns a valid Tetromino object.
+func Checks(s string) (*model.Tetromino, error) {
+	// 1. Basic validation of characters and line count
 	s, err := verifyLines(s)
 	if err != nil {
-		// ERROR INVALID TETRONOMINO
-		return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
-	}
-	data, err := to2DSlice(s)
-	if err != nil {
-		// INTERNAL ERROR could not convert to slice
-		return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
+		return nil, errors.New("INVALID TETROMINO")
 	}
 
-	return model.Tetromino{}, nil
+	// 2. Convert string format (####) to 2D int slice format ([[1,1,1,1]])
+	data, err := to2DSlice(s)
+	if err != nil {
+		return nil, errors.New("INTERNAL ERROR: could not convert to slice")
+	}
+
+	// 3. Use our smart constructor to validate the shape against templates
+	// This will handle Normalize and Identification (ID, Letter, Rotations)
+	t, err := model.NewTetro(data)
+	if err != nil {
+		return nil, errors.New("INVALID SHAPE")
+	}
+
+	return t, nil
 }
 
 func verifyLines(s string) (string, error) {
-	count := 0
-	for i := 0; i < len(s); i++ {
-		if s[i] != '.' && s[i] != '#' && s[i] != '\n' {
-			return "", errors.New("invalid tetromino")
-		}
-		if s[i] == '\n' {
-			count++
-			if count > 3 {
-				return "", errors.New("invalid tetromino")
+	// Clean potential carriage returns from Windows-style strings
+	s = strings.ReplaceAll(s, "\r", "")
+
+	lines := strings.Split(strings.TrimSpace(s), "\n")
+	// Standard Tetris input usually expects a 4x4 grid or similar
+	if len(lines) > 4 {
+		return "", errors.New("too many lines")
+	}
+
+	for _, line := range lines {
+		for _, char := range line {
+			if char != '.' && char != '#' {
+				return "", errors.New("invalid character in tetromino")
 			}
 		}
 	}
@@ -38,39 +52,22 @@ func verifyLines(s string) (string, error) {
 }
 
 func to2DSlice(s string) ([][]int, error) {
-	result := [][]int{}
-	index := 0
-	i := 0
+	// Trim leading/trailing whitespace/newlines to avoid empty rows
+	s = strings.TrimSpace(s)
+	lines := strings.Split(s, "\n")
 
-	for {
-		// 1. Check if we have reached the end of the string
-		if index >= len(s) {
-			break
-		}
+	result := make([][]int, len(lines))
 
-		// 2. Initialize a new row in the 2D slice
-		result = append(result, []int{})
-
-		for {
-			// 3. Check for line breaks or end of string to terminate the current row
-			if index >= len(s) || s[index] == '\n' {
-				index++ // Skip the newline character
-				break
+	for i, line := range lines {
+		row := make([]int, len(line))
+		for j, char := range line {
+			if char == '#' {
+				row[j] = 1
+			} else {
+				row[j] = 0
 			}
-
-			// 4. Map characters to integers: '#' becomes 1, everything else becomes 0
-			val := 0
-			if s[index] == '#' {
-				val = 1
-			}
-
-			// 5. Append the value to the current row and advance index
-			result[i] = append(result[i], val)
-			index++
 		}
-
-		// 6. Increment row counter
-		i++
+		result[i] = row
 	}
 
 	return result, nil

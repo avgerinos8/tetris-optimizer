@@ -43,7 +43,7 @@ var TetroTemplates = map[ShapeType]Tetromino{
 
 // newTetro acts as a constructor that validates an input grid.
 // It identifies which Tetromino type it is and its current rotation.
-func newTetro(inputShape [][]int) (*Tetromino, error) {
+func NewTetro(inputShape [][]int) (*Tetromino, error) {
 	// 1. Create a temporary object to normalize the input
 	t := &Tetromino{Shape: inputShape}
 	t.Normalize()
