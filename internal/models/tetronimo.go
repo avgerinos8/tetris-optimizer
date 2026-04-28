@@ -5,45 +5,110 @@ import (
 	"reflect"
 )
 
-const (
-	O = iota // 0 - SQUARE	1 rotation
-	I        // 1 - LINE		2 rotations
-	S        // 2	-  			2 rotations
-	Z        // 3 -  			2 rotations
-	J        // 4	-			4 rotations
-	L        // 5 -				4 rotations
-	T        // 6 -				4 rotations
+type ShapeType int
 
+const (
+	O ShapeType = iota // 0 - SQUARE	1 rotation
+	I                  // 1 - LINE		2 rotations
+	S                  // 2	-  			2 rotations
+	Z                  // 3 -  			2 rotations
+	J                  // 4	-			4 rotations
+	L                  // 5 -			4 rotations
+	T                  // 6 -			4 rotations
 )
 
 // ── tetromino struct ───────────────────────────────────────────────────────
 
 type Tetromino struct {
 	Letter rune
-	ID     int
-	Shape  [][]int
+
+	Shape [][]int
+
+	ID                 ShapeType
+	AvailableRotations int
+	CurrentRotation    int
+
 	Placed bool
 }
 
-func newTetro(shape [][]int) (*Tetromino, error) {
-	var t *Tetromino = &Tetromino{Shape: shape}
-	// First, crop the shape to its minimum bounding box
+var TetroTemplates = map[ShapeType]Tetromino{
+	O: {Letter: 'O', ID: O, AvailableRotations: 1, Shape: [][]int{{1, 1}, {1, 1}}},
+	I: {Letter: 'I', ID: I, AvailableRotations: 2, Shape: [][]int{{1, 1, 1, 1}}},
+	S: {Letter: 'S', ID: S, AvailableRotations: 2, Shape: [][]int{{0, 1, 1}, {1, 1, 0}}},
+	Z: {Letter: 'Z', ID: Z, AvailableRotations: 2, Shape: [][]int{{1, 1, 0}, {0, 1, 1}}},
+	J: {Letter: 'J', ID: J, AvailableRotations: 4, Shape: [][]int{{1, 0, 0}, {1, 1, 1}}},
+	L: {Letter: 'L', ID: L, AvailableRotations: 4, Shape: [][]int{{0, 0, 1}, {1, 1, 1}}},
+	T: {Letter: 'T', ID: T, AvailableRotations: 4, Shape: [][]int{{0, 1, 0}, {1, 1, 1}}},
+}
+
+// newTetro acts as a constructor that validates an input grid.
+// It identifies which Tetromino type it is and its current rotation.
+func newTetro(inputShape [][]int) (*Tetromino, error) {
+	// 1. Create a temporary object to normalize the input
+	t := &Tetromino{Shape: inputShape}
 	t.Normalize()
 
-	// Compare normalized shape against all valid rotations
-	for id, rotations := range validShapes {
-		for _, rotation := range rotations {
-			if reflect.DeepEqual(t.Shape, rotation) {
-				t.ID = id
-				// Map ID to Letter
-				letters := []rune{'O', 'I', 'S', 'Z', 'J', 'L', 'T'}
-				t.Letter = letters[id]
-				return t, nil
+	// 2. Iterate through our known templates (O, I, S, Z, J, L, T)
+	for id, template := range TetroTemplates {
+		// We copy the template to test its rotations without modifying the original
+		testTetro := template
+
+		// 3. Cycle through all valid rotations of this specific piece
+		for r := 0; r < template.AvailableRotations; r++ {
+
+			// --- DeepEqual Explanation ---
+			// reflect.DeepEqual is essential here because in Go, you cannot compare
+			// two slices using "==". Slices are reference types.
+			// DeepEqual recursively checks:
+			//   a) If the dimensions (lengths) of the nested slices match.
+			//   b) If every single integer at every [row][col] is identical.
+			if reflect.DeepEqual(t.Shape, testTetro.Shape) {
+				// Match found! Return a new pointer with full metadata.
+				return &Tetromino{
+					Letter:             template.Letter,
+					ID:                 id,
+					Shape:              testTetro.Shape, // Keep the matched rotation
+					AvailableRotations: template.AvailableRotations,
+					CurrentRotation:    r,
+					Placed:             false,
+				}, nil
 			}
+
+			// 4. If no match, rotate the test piece and normalize for the next comparison
+			testTetro.Rotate()
+			testTetro.Normalize()
 		}
 	}
 
-	return nil, errors.New("invalid tetromino shape")
+	return nil, errors.New("the provided shape is not a valid tetromino")
+}
+
+// Rotate performs a 90-degree clockwise rotation using matrix transposition.
+func (t *Tetromino) Rotate() {
+	if len(t.Shape) == 0 {
+		return
+	}
+
+	rows := len(t.Shape)
+	cols := len(t.Shape[0])
+
+	// 1. Create a new grid with swapped dimensions (rows become columns)
+	newShape := make([][]int, cols)
+	for i := range newShape {
+		newShape[i] = make([]int, rows)
+	}
+
+	// 2. Perform the rotation logic:
+	// To rotate 90° clockwise:
+	// NewRow = OldColumn
+	// NewColumn = (TotalRows - 1) - OldRow
+	for r := 0; r < rows; r++ {
+		for c := 0; c < cols; c++ {
+			newShape[c][rows-1-r] = t.Shape[r][c]
+		}
+	}
+
+	t.Shape = newShape
 }
 
 // Normalize crops the Shape grid to remove empty rows and columns around the piece.
@@ -97,88 +162,4 @@ func (t *Tetromino) Normalize() {
 
 	// 3. Replace the old shape with the normalized one
 	t.Shape = newShape
-}
-
-// ALL 19 valid tetrominos (normalized)
-var validShapes = map[int][][][]int{
-	O: {
-		/* ■■
-		   ■■ */
-		{{1, 1}, {1, 1}},
-	},
-	I: {
-		/* ■■■■ */
-		{{1, 1, 1, 1}},
-		/* ■
-		   ■
-		   ■
-		   ■ */
-		{{1}, {1}, {1}, {1}},
-	},
-	S: {
-		/*  ■■
-		■■  */
-		{{0, 1, 1}, {1, 1, 0}},
-		/* ■
-		   ■■
-		    ■ */
-		{{1, 0}, {1, 1}, {0, 1}},
-	},
-	Z: {
-		/* ■■
-		   ■■ */
-		{{1, 1, 0}, {0, 1, 1}},
-		/*  ■
-		■■
-		■  */
-		{{0, 1}, {1, 1}, {1, 0}},
-	},
-	J: {
-		/* ■
-		   ■■■ */
-		{{1, 0, 0}, {1, 1, 1}},
-		/* ■■
-		   ■
-		   ■   */
-		{{1, 1}, {1, 0}, {1, 0}},
-		/* ■■■
-		   ■ */
-		{{1, 1, 1}, {0, 0, 1}},
-		/*  ■
-		    ■
-		   ■■  */
-		{{0, 1}, {0, 1}, {1, 1}},
-	},
-	L: {
-		/*   ■
-		■■■ */
-		{{0, 0, 1}, {1, 1, 1}},
-		/* ■
-		   ■
-		   ■■  */
-		{{1, 0}, {1, 0}, {1, 1}},
-		/* ■■■
-		   ■   */
-		{{1, 1, 1}, {1, 0, 0}},
-		/* ■■
-		   ■
-		   ■  */
-		{{1, 1}, {0, 1}, {0, 1}},
-	},
-	T: {
-		/*  ■
-		■■■ */
-		{{0, 1, 0}, {1, 1, 1}},
-		/* ■
-		   ■■
-		   ■   */
-		{{1, 0}, {1, 1}, {1, 0}},
-		/* ■■■
-		   ■  */
-		{{1, 1, 1}, {0, 1, 0}},
-		/*  ■
-		■■
-		 ■  */
-		{{0, 1}, {1, 1}, {0, 1}},
-	},
 }
