@@ -4,6 +4,8 @@ import (
 	"flag"
 	"fmt"
 	"os"
+
+	checks "tetris/internal/checks"
 )
 
 // ── boolean ────────────────────────────────────────────────────────────────
@@ -16,7 +18,7 @@ var ModeRotation bool
 
 func main() {
 	filename := args()
-	checks.openFile(filename)
+	checks.OpenFile(filename)
 }
 
 // ── read flag and arguments ────────────────────────────────────────────────
