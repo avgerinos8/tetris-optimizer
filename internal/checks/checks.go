@@ -7,19 +7,17 @@ import (
 )
 
 func Checks(s string) (model.Tetromino, error) {
-
-		s, err := verifyLines(s)
-		if err != nil {
-			// ERROR INVALID TETRONOMINO
-			return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
-		}
-		data, err := to2DSlice(s)
-		if err != nil {
-			// INTERNAL ERROR could not convert to slice
-			return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
-		}
-		
+	s, err := verifyLines(s)
+	if err != nil {
+		// ERROR INVALID TETRONOMINO
+		return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
 	}
+	data, err := to2DSlice(s)
+	if err != nil {
+		// INTERNAL ERROR could not convert to slice
+		return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
+	}
+
 	return model.Tetromino{}, nil
 }
 
