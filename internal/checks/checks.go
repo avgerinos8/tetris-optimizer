@@ -7,7 +7,7 @@ import (
 )
 
 func Checks(s string) (model.Tetromino, error) {
-	if s != "" {
+
 		s, err := verifyLines(s)
 		if err != nil {
 			// ERROR INVALID TETRONOMINO
@@ -18,8 +18,9 @@ func Checks(s string) (model.Tetromino, error) {
 			// INTERNAL ERROR could not convert to slice
 			return model.Tetromino{}, errors.New("INVALID TETRONOMINO")
 		}
-		return model.Tetromino{}, nil
+		
 	}
+	return model.Tetromino{}, nil
 }
 
 func verifyLines(s string) (string, error) {

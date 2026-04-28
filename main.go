@@ -125,8 +125,9 @@ func openFile(filename string) []model.Tetromino {
 	// 5. THE EXECUTION LOOP
 	for scanner.Scan() {
 		block := strings.TrimSpace(scanner.Text()) // remove whitespace from both ends of the string (left and right)
-		checks.Checks(block)
-
+		if block != "" {
+			checks.Checks(block)
+		}
 		fmt.Printf("\033[38;2;051;255;119m  Parsed Block:  \033[0;00m  \n%s\n", block)
 		shapecounter++
 	}
