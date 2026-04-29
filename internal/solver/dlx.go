@@ -2,120 +2,153 @@ package solver
 
 // ── structs ────────────────────────────────────────────────────────────────
 
-// Node is a single cell in the toroidal doubly-linked mesh.
-// Every "1" in the constraint matrix becomes one Node.
 type Node struct {
-	up, down, left, right *Node
-	column                *ColumnHeader
+	up    *Node
+	down  *Node
+	left  *Node
+	right *Node
 
-	// Payload: what decision does this row represent?
-	char   byte    // the letter assigned to this piece: 'A', 'B', ...
-	coords []Point // the 4 (col, row) positions this placement covers on the board
+	Column *ColumnNode
 }
 
-// Point is a single (col, row) coordinate on the board.
-type Point struct {
-	Col, Row int
+type ColumnNode struct {
+	Head       Node
+	ColNum     int
+	NdAmount   int
+	isRequired bool
 }
 
-// ColumnHeader is the "header" node at the top of each column.
-// It embeds Node so it can participate in the circular mesh like any other node.
-type ColumnHeader struct {
-	Node     // embedded: up/down/left/right still work
-	size int // number of active nodes currently in this column
-	id   int // column index (0..N-1 for pieces, N..N+S²-1 for cells)
-}
-
-// DLX holds the entire Dancing Links structure for one board size S.
 type DLX struct {
-	root            ColumnHeader // sentinel: root.right is the first primary column
-	headers         []*ColumnHeader
-	firstCellColumn *ColumnHeader // first secondary (cell) column — marks the boundary
-	S               int           // current board side length
-	N               int           // number of pieces
-	solution        []*Node       // nodes chosen so far (one per piece)
+	root    ColumnNode // sentinel: root.right is the first primary column
+	headers []*ColumnNode
+	S       int // current board side length
+	N       int // number of pieces
 }
 
-// ── constructor ────────────────────────────────────────────────────────────
+func CreateDLX(s, n int) *DLX {
+	numberofColumns := n + s*s
+	dlx := &DLX{S: s, N: n}
+	dlx.headers = []*ColumnNode{}
 
-// NewDLX builds the column headers for a board of side S with N pieces.
-// Primary columns  : indices 0 .. N-1       (one per piece — MUST be covered)
-// Secondary columns: indices N .. N+(S²)-1  (one per cell  — may stay empty)
-func NewDLX(N, S int) *DLX {
-	// TODO:
-	// 1. Allocate DLX, set .N and .S
-	// 2. Wire root to itself (root.left = root.right = &root)
-	// 3. For each column index i in 0 .. N+S²-1:
-	//    a. Allocate a ColumnHeader with id=i
-	//    b. Wire it into the horizontal list to the LEFT of root
-	//       (so root stays the rightmost sentinel)
-	//    c. Wire its vertical list to itself (header.up = header.down = &header.Node)
-	//    d. If i == N, save the pointer as dlx.firstCellColumn
-	// 4. Save all headers in dlx.headers slice
-	// 5. Return dlx
-	return nil
+	dlx.root.Head.right = &dlx.root.Head
+	dlx.root.Head.left = &dlx.root.Head
+
+	for i := 0; i < numberofColumns; i++ {
+		isReq := false
+		if i < n {
+			isReq = true
+		}
+		newcolumn := &ColumnNode{ColNum: i, isRequired: isReq}
+
+		newcolumn.Head.Column = newcolumn
+
+		newcolumn.Head.up = &newcolumn.Head
+		newcolumn.Head.down = &newcolumn.Head
+
+		newcolumn.Head.left = dlx.root.Head.left
+		newcolumn.Head.right = &dlx.root.Head
+		newcolumn.Head.left.right = &newcolumn.Head
+		dlx.root.Head.left = &newcolumn.Head
+
+		dlx.headers = append(dlx.headers, newcolumn)
+	}
+	return dlx
 }
 
-// ── row insertion ──────────────────────────────────────────────────────────
+func (dlx *DLX) AddRow(cols []*ColumnNode) {
+	var first *Node
+	for i := 0; i < len(cols); i++ {
 
-// AddRow inserts one decision (placement) into the mesh.
-// char   : the letter for this piece ('A', 'B', ...)
-// coords : the 4 board positions this placement occupies
-// colIDs : exactly 5 column indices — [pieceIdx, cellIdx1, cellIdx2, cellIdx3, cellIdx4]
-func (dlx *DLX) AddRow(char byte, coords []Point, colIDs []int) {
-	// TODO:
-	// For each colIdx in colIDs:
-	//   1. Fetch header := dlx.headers[colIdx]
-	//   2. Create newNode with .char, .coords, .column = header
-	//   3. Vertical insertion (append to BOTTOM of column's circular list):
-	//        newNode.up   = header.up
-	//        newNode.down = &header.Node
-	//        header.up.down = newNode
-	//        header.up      = newNode
-	//        header.size++
-	//   4. Horizontal insertion (circular among this row's nodes):
-	//      - Track firstNode (first node created for this row)
-	//      - If firstNode == nil: set firstNode = newNode, wire newNode to itself
-	//      - Else: insert newNode to the LEFT of firstNode in the circular list
+		newNode := &Node{Column: cols[i]}
+		cols[i].NdAmount++
+
+		newNode.up = cols[i].Head.up
+		newNode.down = &cols[i].Head
+		cols[i].Head.up = newNode
+		newNode.up.down = newNode
+
+		if first == nil {
+			first = newNode
+			first.right = first
+			first.left = first
+		} else {
+			newNode.left = first.left
+			newNode.right = first
+			first.left = newNode
+			newNode.left.right = newNode
+		}
+	}
 }
 
-// ── cover / uncover ────────────────────────────────────────────────────────
+func (dlx *DLX) Cover(c *ColumnNode) {
+	c.Head.left.right = c.Head.right
+	c.Head.right.left = c.Head.left
+	vertipos := c.Head.down
+	for {
+		horipos := vertipos.right
+		for {
 
-// Cover removes column c from the header list and removes all rows
-// that have a node in column c (they conflict with the chosen row).
-func (dlx *DLX) Cover(c *ColumnHeader) {
-	// TODO:
-	// 1. Unlink c from the horizontal header list:
-	//      c.right.left = c.left
-	//      c.left.right = c.right
-	// 2. For each node i going DOWN column c (skip header itself):
-	//    For each node j going RIGHT from i (skip i itself):
-	//      j.down.up = j.up
-	//      j.up.down = j.down
-	//      j.column.size--
+			horipos.up.down = horipos.down
+			horipos.down.up = horipos.up
+
+			horipos.Column.NdAmount--
+
+			if horipos.right.Column == c {
+				break
+			}
+			horipos = horipos.right // move right for the next iteration
+		}
+
+		if vertipos.down == &c.Head {
+			break
+		}
+		vertipos = vertipos.down // move down for the next iteration
+	}
 }
 
-// Uncover is the exact reverse of Cover — must run in reverse order.
-func (dlx *DLX) Uncover(c *ColumnHeader) {
-	// TODO:
-	// 1. For each node i going UP column c (reverse of Cover — skip header):
-	//    For each node j going LEFT from i (reverse of Cover — skip i):
-	//      j.column.size++
-	//      j.down.up = j
-	//      j.up.down = j
-	// 2. Relink c into the horizontal header list:
-	//      c.right.left = c
-	//      c.left.right = c
+func (dlx *DLX) Uncover(c *ColumnNode) {
+	vertipos := c.Head.up
+	for {
+		horipos := vertipos.left
+		for {
+			horipos.up.down = horipos
+			horipos.down.up = horipos
+			horipos.Column.NdAmount++
+			if horipos.left == &c.Head {
+				break
+			}
+			horipos = horipos.left // move left for the next iteration
+		}
+		if vertipos.up == &c.Head {
+			break
+		}
+		vertipos = vertipos.up // move up for the next iteration
+	}
+
+	c.Head.left.right = &c.Head
+	c.Head.right.left = &c.Head
 }
 
-// ── heuristic ─────────────────────────────────────────────────────────────
+func (dlx *DLX) MRVSelect() *ColumnNode {
+	var min int
+	var chosen *ColumnNode
+	firstRun := true
 
-// selectBestColumn picks the primary column with the fewest nodes (MRV heuristic).
-// It only scans primary columns (stops at firstCellColumn).
-func (dlx *DLX) selectBestColumn() *ColumnHeader {
-	// TODO:
-	// Start from dlx.root.right, walk right until you hit dlx.firstCellColumn (or root).
-	// Track the column with the minimum .size.
-	// Return it.
-	return nil
+	for current := dlx.root.Head.right; current != &dlx.root.Head; current = current.right {
+		// if current.Column == nil {
+		// 	continue
+		// }
+		if current.Column.isRequired {
+			if firstRun {
+				min = current.Column.NdAmount
+				chosen = current.Column
+				firstRun = false
+			}
+			if min > current.Column.NdAmount {
+				chosen = current.Column
+				min = current.Column.NdAmount
+			}
+		}
+	}
+	return chosen
 }
