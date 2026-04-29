@@ -3,10 +3,10 @@ package checks
 import (
 	"bufio"
 	"fmt"
+	"log/slog"
 	"os"
 	"regexp"
 	"strings"
-
 	model "tetris/internal/models"
 )
 
@@ -20,6 +20,9 @@ func OpenFile(filename string) []*model.Tetromino {
 		fmt.Fprintf(os.Stderr, "Could not open filename %q: %v\n", filename, err)
 		os.Exit(1)
 	}
+
+	slog.Info("File opened", "filename", filename)
+
 	defer file.Close()
 
 	// SCANNER AND REGEX

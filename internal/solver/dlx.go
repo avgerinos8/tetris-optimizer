@@ -19,10 +19,11 @@ type ColumnNode struct {
 }
 
 type DLX struct {
-	root    ColumnNode // sentinel: root.right is the first primary column
-	headers []*ColumnNode
-	S       int // current board side length
-	N       int // number of pieces
+	root            ColumnNode // sentinel: root.right is the first primary column
+	headers         []*ColumnNode
+	S               int // current board side length
+	N               int // number of pieces
+	currentSolution []*Node
 }
 
 func CreateDLX(s, n int) *DLX {
