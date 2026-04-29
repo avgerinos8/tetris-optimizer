@@ -135,9 +135,6 @@ func (dlx *DLX) MRVSelect() *ColumnNode {
 	firstRun := true
 
 	for current := dlx.root.Head.right; current != &dlx.root.Head; current = current.right {
-		// if current.Column == nil {
-		// 	continue
-		// }
 		if current.Column.isRequired {
 			if firstRun {
 				min = current.Column.NdAmount
