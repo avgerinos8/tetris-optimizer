@@ -30,12 +30,12 @@ func (dlx *DLX) search() bool {
 		}
 
 		dlx.currentSolution = append(dlx.currentSolution, i)
-		//recursion
+		// recursion
 		if dlx.search() {
 			return true
 		}
 		dlx.currentSolution = dlx.currentSolution[:len(dlx.currentSolution)-1]
-		//backtracking
+		// backtracking
 		for j := i.left; j != i; j = j.left {
 			dlx.Uncover(j.Column)
 		}
@@ -47,7 +47,7 @@ func (dlx *DLX) search() bool {
 // ── solution extraction ────────────────────────────────────────────────────
 
 // recordSolution decodes the selected DLX nodes back into board coordinates.
-func (dlx *DLX) recordSolution() {
+func (dlx *DLX) RecordSolution() {
 	// currentSolution contains one node per chosen row.
 	for _, node := range dlx.currentSolution {
 		var pIndex int
@@ -64,12 +64,12 @@ func (dlx *DLX) recordSolution() {
 				// Columns N+ represent board cells.
 				// Decode: whichColumn = N + (y * S) + x
 
-				// relativeIdx := col.ColNum - dlx.N
-				// y := relativeIdx / dlx.S
-				// x := relativeIdx % dlx.S
+				relativeIdx := col.ColNum - dlx.N
+				y := relativeIdx / dlx.S
+				x := relativeIdx % dlx.S
 
 				// Map the Piece ID to the FinalBoard for the printer.
-				// dlx.FinalBoard[y][x] = pIndex + 1 // +1 if you want 1-based indexing for colors
+				dlx.FinalBoard[y][x] = rune(pIndex + 'A')
 			}
 
 			curr = curr.right

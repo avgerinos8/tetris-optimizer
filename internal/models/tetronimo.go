@@ -20,8 +20,6 @@ const (
 // ── tetromino struct ───────────────────────────────────────────────────────
 
 type Tetromino struct {
-	Letter rune
-
 	Shape [][]int
 
 	ID                 ShapeType

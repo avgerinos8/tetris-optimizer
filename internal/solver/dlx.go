@@ -24,6 +24,7 @@ type DLX struct {
 	S               int // current board side length
 	N               int // number of pieces
 	currentSolution []*Node
+	FinalBoard      [][]rune
 }
 
 func CreateDLX(s, n int) *DLX {

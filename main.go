@@ -10,6 +10,8 @@ import (
 
 	checks "tetris/internal/checks"
 	model "tetris/internal/models"
+
+	output "tetris/internal/output"
 	solver "tetris/internal/solver"
 )
 
@@ -17,8 +19,10 @@ import (
 
 // ModeRotation is a global variable that tells our program
 // if it should allow rotating the pieces.
-var ModeRotation bool
-var ModeEnableLogs bool
+var (
+	ModeRotation   bool
+	ModeEnableLogs bool
+)
 
 // ── main ───────────────────────────────────────────────────────────────────
 
@@ -38,11 +42,18 @@ func main() {
 	side := int(math.Ceil(math.Sqrt(float64(minSquares))))
 
 	for {
-		DL := solver.CreateDLX(side, numberOfPieces)
-		DL.BuildMesh(Tetrominos, ModeRotation)
-		DL.Solve()
+		DancingLinks := solver.CreateDLX(side, numberOfPieces)
+		DancingLinks.BuildMesh(Tetrominos, ModeRotation)
+		if DancingLinks.Solve() {
+			DancingLinks.RecordSolution()
+			slog.Info(fmt.Sprintf("Solution found! All pieces fit into the %dx%d square!", side, side))
+			output.PrintSolution(DancingLinks.FinalBoard)
+			break
+		} else {
+			slog.Info(fmt.Sprintf("Could not fit pieces into %dx%d square, continuing to bigger block", side, side))
+			side++
+		}
 	}
-
 }
 
 // ── read flag and arguments ────────────────────────────────────────────────
@@ -103,7 +114,7 @@ func initLogger() *os.File {
 
 	// Case 2: Logs are ENABLED
 	// Open log.txt (Append if exists, Create if not)
-	file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		// If file opening fails, we return nil and main will handle it
 		return nil

@@ -74,7 +74,6 @@ func OpenFile(filename string) []*model.Tetromino {
 		block := strings.TrimSpace(scanner.Text()) // remove whitespace from both ends of the string (left and right)
 		if block != "" {
 			tetron, err := Checks(block)
-			tetron.Letter = letterCounter
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Invalid tetromino: %v\n", err)
 				os.Exit(1)
