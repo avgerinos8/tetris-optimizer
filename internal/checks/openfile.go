@@ -7,6 +7,7 @@ import (
 	"os"
 	"regexp"
 	"strings"
+
 	model "tetris/internal/models"
 )
 
@@ -67,16 +68,19 @@ func OpenFile(filename string) []*model.Tetromino {
 	scanner.Split(SplitFunction)
 
 	alltetrominoes := []*model.Tetromino{}
+	letterCounter := 'A'
 	// 5. THE EXECUTION LOOP
 	for scanner.Scan() {
 		block := strings.TrimSpace(scanner.Text()) // remove whitespace from both ends of the string (left and right)
 		if block != "" {
-			temp, err := Checks(block)
+			tetron, err := Checks(block)
+			tetron.Letter = letterCounter
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "Invalid tetromino: %v\n", err)
 				os.Exit(1)
 			}
-			alltetrominoes = append(alltetrominoes, temp)
+			alltetrominoes = append(alltetrominoes, tetron)
+			letterCounter++
 		}
 	}
 

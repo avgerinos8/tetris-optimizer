@@ -32,13 +32,13 @@ type Tetromino struct {
 }
 
 var TetroTemplates = map[ShapeType]Tetromino{
-	O: {Letter: 'O', ID: O, AvailableRotations: 1, Shape: [][]int{{1, 1}, {1, 1}}},
-	I: {Letter: 'I', ID: I, AvailableRotations: 2, Shape: [][]int{{1, 1, 1, 1}}},
-	S: {Letter: 'S', ID: S, AvailableRotations: 2, Shape: [][]int{{0, 1, 1}, {1, 1, 0}}},
-	Z: {Letter: 'Z', ID: Z, AvailableRotations: 2, Shape: [][]int{{1, 1, 0}, {0, 1, 1}}},
-	J: {Letter: 'J', ID: J, AvailableRotations: 4, Shape: [][]int{{1, 0, 0}, {1, 1, 1}}},
-	L: {Letter: 'L', ID: L, AvailableRotations: 4, Shape: [][]int{{0, 0, 1}, {1, 1, 1}}},
-	T: {Letter: 'T', ID: T, AvailableRotations: 4, Shape: [][]int{{0, 1, 0}, {1, 1, 1}}},
+	O: {ID: O, AvailableRotations: 1, Shape: [][]int{{1, 1}, {1, 1}}},
+	I: {ID: I, AvailableRotations: 2, Shape: [][]int{{1, 1, 1, 1}}},
+	S: {ID: S, AvailableRotations: 2, Shape: [][]int{{0, 1, 1}, {1, 1, 0}}},
+	Z: {ID: Z, AvailableRotations: 2, Shape: [][]int{{1, 1, 0}, {0, 1, 1}}},
+	J: {ID: J, AvailableRotations: 4, Shape: [][]int{{1, 0, 0}, {1, 1, 1}}},
+	L: {ID: L, AvailableRotations: 4, Shape: [][]int{{0, 0, 1}, {1, 1, 1}}},
+	T: {ID: T, AvailableRotations: 4, Shape: [][]int{{0, 1, 0}, {1, 1, 1}}},
 }
 
 // newTetro acts as a constructor that validates an input grid.
@@ -65,7 +65,6 @@ func NewTetro(inputShape [][]int) (*Tetromino, error) {
 			if reflect.DeepEqual(t.Shape, testTetro.Shape) {
 				// Match found! Return a new pointer with full metadata.
 				return &Tetromino{
-					Letter:             template.Letter,
 					ID:                 id,
 					Shape:              testTetro.Shape, // Keep the matched rotation
 					AvailableRotations: template.AvailableRotations,
