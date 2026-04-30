@@ -15,7 +15,7 @@ func (dlx *DLX) Solve() bool {
 
 // search is the internal recursive backtracker (Algorithm X / DLX).
 func (dlx *DLX) search() bool {
-	if !dlx.root.Head.right.Column.isRequired || dlx.root.Head.right == &dlx.root.Head {
+	if dlx.root.Head.right == &dlx.root.Head || !dlx.root.Head.right.Column.isRequired {
 		return true
 	}
 	selectedCol := dlx.MRVSelect()

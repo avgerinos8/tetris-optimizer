@@ -54,6 +54,10 @@ func CreateDLX(s, n int) *DLX {
 
 		dlx.headers = append(dlx.headers, newcolumn)
 	}
+	dlx.FinalBoard = make([][]rune, s)
+	for i := range dlx.FinalBoard {
+		dlx.FinalBoard[i] = make([]rune, s)
+	}
 	return dlx
 }
 
@@ -87,18 +91,11 @@ func (dlx *DLX) Cover(c *ColumnNode) {
 	c.Head.right.left = c.Head.left
 	vertipos := c.Head.down
 	for {
-		horipos := vertipos.right
-		for {
 
+		for horipos := vertipos.right; horipos != vertipos; horipos = horipos.right {
 			horipos.up.down = horipos.down
 			horipos.down.up = horipos.up
-
 			horipos.Column.NdAmount--
-
-			if horipos.right.Column == c {
-				break
-			}
-			horipos = horipos.right // move right for the next iteration
 		}
 
 		if vertipos.down == &c.Head {
@@ -111,15 +108,10 @@ func (dlx *DLX) Cover(c *ColumnNode) {
 func (dlx *DLX) Uncover(c *ColumnNode) {
 	vertipos := c.Head.up
 	for {
-		horipos := vertipos.left
-		for {
+		for horipos := vertipos.left; horipos != vertipos; horipos = horipos.left {
 			horipos.up.down = horipos
 			horipos.down.up = horipos
 			horipos.Column.NdAmount++
-			if horipos.left == &c.Head {
-				break
-			}
-			horipos = horipos.left // move left for the next iteration
 		}
 		if vertipos.up == &c.Head {
 			break
