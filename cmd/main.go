@@ -23,6 +23,7 @@ var (
 	ModeRotation   bool
 	ModeEnableLogs bool
 	ModeColor      bool
+	ModeColorOnly  bool
 )
 
 // ── main ───────────────────────────────────────────────────────────────────
@@ -48,7 +49,7 @@ func main() {
 		if DancingLinks.Solve() {
 			DancingLinks.RecordSolution()
 			slog.Info(fmt.Sprintf("Solution found! All pieces fit into the %dx%d square!", side, side))
-			output.PrintSolution(DancingLinks.FinalBoard, ModeColor)
+			output.PrintSolution(DancingLinks.FinalBoard, ModeColor, ModeColorOnly)
 			break
 		} else {
 			slog.Info(fmt.Sprintf("Could not fit pieces into %dx%d square, continuing to bigger block", side, side))
@@ -69,13 +70,15 @@ func args() string {
 	// The problem occurs if a user types: myapp -r=true -rotate=false
 	// The second flag would overwrite the first one. By using two variables,
 	// we can capture both inputs independently and then decide the final state.
-	var r, rotate, l, logs, c, color bool
+	var r, rotate, l, logs, c, color, co, coloronly bool
 	flag.BoolVar(&r, "r", false, "Rotate alias")
 	flag.BoolVar(&rotate, "rotate", false, "Rotate alias")
 	flag.BoolVar(&l, "l", false, "Rotate alias")
 	flag.BoolVar(&logs, "logs", false, "Rotate alias")
-	flag.BoolVar(&c, "color", false, "Color alias")
-	flag.BoolVar(&color, "c", false, "Color alias")
+	flag.BoolVar(&c, "c", false, "Color alias")
+	flag.BoolVar(&color, "color", false, "Color alias")
+	flag.BoolVar(&co, "co", false, "Color alias")
+	flag.BoolVar(&coloronly, "coloronly", false, "Color alias")
 
 	flag.Parse()
 	arguments := flag.Args()
@@ -96,6 +99,7 @@ func args() string {
 	ModeRotation = r || rotate
 	ModeEnableLogs = l || logs
 	ModeColor = c || color
+	ModeColorOnly = co || coloronly
 
 	// ARGUMENT VALIDATION
 	if len(arguments) != 1 {

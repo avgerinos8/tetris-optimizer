@@ -32,7 +32,7 @@ const (
 
 // PrintSolution renders the solved board to stdout.
 // Each cell is the letter of the piece that covers it, or '.' if empty.
-func PrintSolution(winningboard [][]rune, color bool) {
+func PrintSolution(winningboard [][]rune, color bool, colorOnly bool) {
 	// Map letters A-Z to our defined colors
 	palette := []colorCodes{
 		Red, Orange, ElectricBlue, Magenta, Yellow, Cyan, Purple, Lime, Green, Emerald,
@@ -51,6 +51,8 @@ func PrintSolution(winningboard [][]rune, color bool) {
 			if char == "." {
 				if color {
 					fmt.Print("░░░")
+				} else if colorOnly {
+					fmt.Print("   ")
 				} else {
 					fmt.Print(".")
 				}
@@ -58,6 +60,9 @@ func PrintSolution(winningboard [][]rune, color bool) {
 				if color {
 					colorIdx := int(cell-'A') % len(palette)
 					fmt.Printf("%s %s %s", palette[colorIdx], char, Reset)
+				} else if colorOnly {
+					colorIdx := int(cell-'A') % len(palette)
+					fmt.Printf("%s   %s", palette[colorIdx], Reset)
 				} else {
 					fmt.Printf("%s", char)
 				}
