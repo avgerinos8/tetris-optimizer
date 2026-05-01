@@ -54,7 +54,6 @@ func NewTetro(inputShape [][]int) (*Tetromino, error) {
 		// 3. Cycle through all valid rotations of this specific piece
 		for r := 0; r < template.AvailableRotations; r++ {
 
-			// --- DeepEqual Explanation ---
 			// reflect.DeepEqual is essential here because in Go, you cannot compare
 			// two slices using "==". Slices are reference types.
 			// DeepEqual recursively checks:

@@ -155,7 +155,7 @@ go build -o tetris ./cmd/main.go
 
 # Run
 ./tetris example.txt
-./tetris -r example.txt
+./tetris -c -l example.txt
 ```
 
 ---
