@@ -89,34 +89,24 @@ func (dlx *DLX) AddRow(cols []*ColumnNode) {
 func (dlx *DLX) Cover(c *ColumnNode) {
 	c.Head.left.right = c.Head.right
 	c.Head.right.left = c.Head.left
-	vertipos := c.Head.down
-	for {
 
+	for vertipos := c.Head.down; vertipos != &c.Head; vertipos = vertipos.down {
 		for horipos := vertipos.right; horipos != vertipos; horipos = horipos.right {
 			horipos.up.down = horipos.down
 			horipos.down.up = horipos.up
 			horipos.Column.NdAmount--
 		}
-
-		if vertipos.down == &c.Head {
-			break
-		}
-		vertipos = vertipos.down // move down for the next iteration
 	}
 }
 
 func (dlx *DLX) Uncover(c *ColumnNode) {
-	vertipos := c.Head.up
-	for {
+	// Iterate in reverse (up from sentinel) — symmetric to Cover.
+	for vertipos := c.Head.up; vertipos != &c.Head; vertipos = vertipos.up {
 		for horipos := vertipos.left; horipos != vertipos; horipos = horipos.left {
 			horipos.up.down = horipos
 			horipos.down.up = horipos
 			horipos.Column.NdAmount++
 		}
-		if vertipos.up == &c.Head {
-			break
-		}
-		vertipos = vertipos.up // move up for the next iteration
 	}
 
 	c.Head.left.right = &c.Head
