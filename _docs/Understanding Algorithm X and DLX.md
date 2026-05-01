@@ -74,7 +74,19 @@ Each row contains exactly **5 ones**:
 
 ---
 
-## 5. Why the Model Works
+## 5. Important Clarification
+
+This is where most beginners get confused:
+
+> ❗ This matrix is **NOT your original problem**
+
+It is a **new representation** of your problem.
+
+- **Columns = constraints (rules that MUST be satisfied)**
+- **Rows = decisions (choices you can make)**
+
+You are NOT solving the original grid directly.  
+You are solving a **constraint satisfaction problem**.
 
 A valid solution selects **N rows** such that:
 
