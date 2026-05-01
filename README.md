@@ -40,16 +40,21 @@ go run . [-r | -rotate] <filename>
 | Flag | Description |
 |---|---|
 | *(none)* | Place pieces in the exact orientation given in the file |
-| `-r` / `-rotate` | Allow the solver to rotate pieces freely |
+| `-r` / `-rotate` | _Free Rotation_: Allows the solver to rotate pieces in any direction to find a valid placement. |
+| `-c` / `-color` | _Colorized Output_: Displays the final result using colors for better visual distinction. |
+| `-l` / `-logs` | _Extended Logging_: Generates a detailed execution log saved to log.txt. |
 
 ### Examples
 
 ```bash
 # No rotation — pieces placed as-is
-go run . samples/input.txt
+go run ./... example.txt
 
 # With rotation — solver can spin pieces
-go run . -r samples/input.txt
+go run ./... -r example.txt
+
+# With rotation, colorized output and logs.txt
+go run ./... -r -c -l example.txt
 ```
 
 ---
@@ -96,16 +101,27 @@ If no solution exists within the size cap (16×16), the program prints
 
 ```
 tetris/
-├── main.go                    # CLI entry point (flags, orchestration)
-├── internal/
-│   ├── models/
-│   │   └── tetromino.go       # Tetromino struct, templates, Rotate, Normalize, NewTetro
-│   ├── checks/
-│   │   └── checks.go          # File I/O, block splitting, validation pipeline
-│   ├── solver/
-│   │   └── dlx.go             # DLX mesh, Cover/Uncover, Search, BuildMesh, Solve
-│   └── output/
-│       └── printer.go         # PrintBoard, PrintError
+.
+├── README.md
+├── _docs
+│   ├── PRD.md
+│   └── Understanding Algorithm X and DLX.md
+├── cmd
+│   └── main.go               # CLI entry point (flags, orchestration)
+│
+├── internal
+│   ├── checks
+│   │   ├── checks.go         # Piece validation pipeline
+│   │   └── openfile.go       # File I/O, Block splitting
+│   ├── models
+│   │   └── tetronimo.go      # Tetromino struct, templates, Rotate, Normalize
+│   ├── output
+│   │   └── printer.go        # PrintSolution
+│   └── solver
+│       ├── dlx.go            # DLX mesh, Cover/Uncover, Search, BuildMesh
+│       ├── dlx_test.go       # Unit tests for dlx.go
+│       ├── placement.go      # Filling mesh with nodes
+│       └── search.go         # Recursion & Backtracking
 └── go.mod
 ```
 
@@ -135,7 +151,7 @@ The solver uses **Knuth's Algorithm X with Dancing Links**:
 
 ```bash
 # Build binary
-go build -o tetris .
+go build -o tetris ./cmd/main.go
 
 # Run
 ./tetris example.txt

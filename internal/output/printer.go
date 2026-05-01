@@ -11,17 +11,17 @@ const (
 	Reset colorCodes = "\033[0m"
 
 	// Format: Background RGB + Foreground Black (0,0,0)
-	Red          colorCodes = "\033[48;2;255;50;50;38;2;0;0;0m"
+	Red          colorCodes = "\033[48;2;255;22;22;38;2;255;255;255m"
 	Orange       colorCodes = "\033[48;2;234;138;0;38;2;0;0;0m"
 	Amber        colorCodes = "\033[48;2;255;168;0;38;2;0;0;0m"
 	Yellow       colorCodes = "\033[48;2;255;255;0;38;2;0;0;0m"
 	Lime         colorCodes = "\033[48;2;0;184;48;38;2;255;255;255m"
-	Green        colorCodes = "\033[48;2;50;255;50;38;2;0;0;0m"
-	Emerald      colorCodes = "\033[48;2;0;255;150;38;2;0;0;0m"
+	Green        colorCodes = "\033[48;2;0;255;42;38;2;0;0;0m"
+	Emerald      colorCodes = "\033[48;2;0;159;94;38;2;255;255;255m"
 	Cyan         colorCodes = "\033[48;2;0;255;255;38;2;0;0;0m"
 	SkyBlue      colorCodes = "\033[48;2;0;190;255;38;2;0;0;0m"
 	ElectricBlue colorCodes = "\033[48;2;0;82;255;38;2;255;255;255m"
-	Violet       colorCodes = "\033[48;2;191;53;255;38;2;0;0;0m"
+	HotPink      colorCodes = "\033[48;2;187;0;79;38;2;255;255;255m"
 	Magenta      colorCodes = "\033[48;2;255;0;255;38;2;255;255;255m"
 	Purple       colorCodes = "\033[48;2;166;0;166;38;2;0;0;0m"
 	Gray         colorCodes = "\033[48;2;112;112;112;38;2;0;0;0m"
@@ -36,7 +36,7 @@ func PrintSolution(winningboard [][]rune, color bool) {
 	// Map letters A-Z to our defined colors
 	palette := []colorCodes{
 		Red, Orange, ElectricBlue, Magenta, Yellow, Cyan, Purple, Lime, Green, Emerald,
-		SkyBlue, Violet, Amber, Gold, Gray,
+		SkyBlue, HotPink, Amber, Gold, Gray,
 	}
 
 	for _, row := range winningboard {

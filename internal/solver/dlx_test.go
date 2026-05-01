@@ -41,7 +41,7 @@ func TestDLX_Create(t *testing.T) {
 	initTestLogger()
 	slog.Info("=== TestDLX_Create START ===")
 
-	s, n := 2, 1                     // 1 piece, 2x2 board  →  5 columns total
+	s, n := 2, 1 // 1 piece, 2x2 board  →  5 columns total
 	dlx := CreateDLX(s, n)
 
 	slog.Info("CreateDLX done", "S", dlx.S, "N", dlx.N,

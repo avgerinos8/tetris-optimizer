@@ -99,7 +99,7 @@ func args() string {
 
 	// ARGUMENT VALIDATION
 	if len(arguments) != 1 {
-		fmt.Fprintf(os.Stderr, "Usage: %s [-r] <filename>\n", os.Args[0])
+		fmt.Fprintf(os.Stderr, "\033[48;2;206;0;0;38;2;255;255;255m> Error! Invalid arguments. >\033[0m Usage: %s [-r] [-l] [-c] <filename>\n", os.Args[0])
 		os.Exit(1)
 	}
 	return arguments[0]
