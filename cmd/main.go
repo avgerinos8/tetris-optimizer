@@ -122,7 +122,7 @@ func initLogger() *os.File {
 
 	// Case 2: Logs are ENABLED
 	// Open log.txt (Append if exists, Create if not)
-	file, err := os.OpenFile("log.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
+	file, err := os.OpenFile("logs.txt", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0o644)
 	if err != nil {
 		// If file opening fails, we return nil and main will handle it
 		return nil

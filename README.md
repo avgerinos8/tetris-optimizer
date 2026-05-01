@@ -42,7 +42,7 @@ go run . [-r | -rotate] <filename>
 | *(none)* | Place pieces in the exact orientation given in the file |
 | `-r` / `-rotate` | _Free Rotation_: Allows the solver to rotate pieces in any direction to find a valid placement. |
 | `-c` / `-color` | _Colorized Output_: Displays the final result using colors for better visual distinction. |
-| `-l` / `-logs` | _Extended Logging_: Generates a detailed execution log saved to log.txt. |
+| `-l` / `-logs` | _Extended Logging_: Generates a detailed execution log saved to logs.txt. |
 
 ### Examples
 
