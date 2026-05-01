@@ -28,8 +28,7 @@ func (dlx *DLX) search() bool {
 	dlx.Cover(selectedCol)
 	for i := selectedCol.Head.down; i != &selectedCol.Head; i = i.down {
 
-		piece, x, y := dlx.getPlacementInfo(i)
-		slog.Info(fmt.Sprintf("Trying piece %s at %d,%d", piece, x, y))
+		slog.Info("Placing", "on_col", selectedCol.ColNum)
 
 		for j := i.right; j != i; j = j.right {
 			dlx.Cover(j.Column)
@@ -89,32 +88,4 @@ func (dlx *DLX) RecordSolution() {
 		}
 	}
 	slog.Info("Solution successfully recorded")
-}
-
-func (dlx *DLX) getPlacementInfo(node *Node) (string, int, int) {
-	var pIndex int
-	minX, minY := dlx.S, dlx.S
-
-	curr := node
-	for {
-		col := curr.Column
-		if col.ColNum < dlx.N {
-			pIndex = col.ColNum
-		} else {
-			relativeIdx := col.ColNum - dlx.N
-			y := relativeIdx / dlx.S
-			x := relativeIdx % dlx.S
-			if y < minY || (y == minY && x < minX) {
-				minX = x
-				minY = y
-			}
-		}
-		curr = curr.right
-		if curr == node {
-			break
-		}
-	}
-
-	pieceName := string(rune('A' + pIndex))
-	return pieceName, minX, minY
 }
