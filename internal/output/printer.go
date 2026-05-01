@@ -50,7 +50,7 @@ func PrintSolution(winningboard [][]rune, color bool, colorOnly bool) {
 
 			if char == "." {
 				if color {
-					fmt.Print("░░░")
+					fmt.Print("   ")
 				} else if colorOnly {
 					fmt.Print("   ")
 				} else {
