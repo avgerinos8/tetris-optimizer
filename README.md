@@ -16,11 +16,6 @@
 
 ---
 
-## 📝 Author
-Pavlos Avgerinos | pavgerin | Cohort 2.3 | Zone01 Athens
-
----
-
 ## 📖 Overview
 
 A command-line tool that reads Tetromino pieces from a file and fits them
@@ -157,6 +152,11 @@ go build -o tetris ./cmd/main.go
 ./tetris example.txt
 ./tetris -c -l example.txt
 ```
+
+---
+
+## 📝 Author
+Pavlos Avgerinos | pavgerin | Cohort 2.3 | Zone01 Athens
 
 ---
 
