@@ -7,25 +7,31 @@ import (
 	model "tetris/internal/models"
 )
 
+const (
+	redCode    string = "\033[1;38;2;255;255;255;48;2;190;0;0m"
+	purpleCode string = "\033[1;97;48;2;89;0;126m"
+	resetCode  string = "\033[0m"
+)
+
 // Checks processes the input string and returns a valid Tetromino object.
 func Checks(s string) (*model.Tetromino, error) {
 	// 1. Basic validation of characters and line count
 	s, err := verifyLines(s)
 	if err != nil {
-		return nil, errors.New("INVALID TETROMINO")
+		return nil, errors.New(redCode + " Error > " + resetCode + " INVALID FORMAT IN INPUT FILE ~" + purpleCode + err.Error() + resetCode)
 	}
 
 	// 2. Convert string format (####) to 2D int slice format ([[1,1,1,1]])
 	data, err := to2DSlice(s)
 	if err != nil {
-		return nil, errors.New("INTERNAL ERROR: could not convert to slice")
+		return nil, errors.New(redCode + " Error > " + resetCode + " INTERNAL ERROR: could not convert to slice")
 	}
 
 	// 3. Use our smart constructor to validate the shape against templates
 	// This will handle Normalize and Identification (ID, Letter, Rotations)
 	t, err := model.NewTetro(data)
 	if err != nil {
-		return nil, errors.New("INVALID SHAPE")
+		return nil, errors.New(redCode + " Error > " + resetCode + " INVALID SHAPE. ONLY VALID TETROMINOS ALLOWED ~" + purpleCode + err.Error() + resetCode)
 	}
 
 	return t, nil
@@ -44,7 +50,7 @@ func verifyLines(s string) (string, error) {
 	for _, line := range lines {
 		for _, char := range line {
 			if char != '.' && char != '#' {
-				return "", errors.New("invalid character in tetromino")
+				return "", errors.New("invalid character in input. only '.' and '#' are supposed to be used")
 			}
 		}
 	}

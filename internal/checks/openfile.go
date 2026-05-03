@@ -75,7 +75,7 @@ func OpenFile(filename string) []*model.Tetromino {
 		if block != "" {
 			tetron, err := Checks(block)
 			if err != nil {
-				fmt.Fprintf(os.Stderr, "Invalid tetromino: %v\n", err)
+				fmt.Fprintf(os.Stderr, "Exiting... %v\n", err)
 				os.Exit(1)
 			}
 			alltetrominoes = append(alltetrominoes, tetron)
